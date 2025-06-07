@@ -18,13 +18,19 @@ DJANGO_APPS = [
 ]
 
 CUSTOM_APPS = [
+    'apps.base',
     'apps.common',
+    'apps.leads',
+    'apps.owner',
+    'apps.users',
+
 ]
 
 THIRD_PARTY_APPS = [
     'rest_framework',
     'drf_spectacular',
     'django_filters',
+    'rest_framework_simplejwt',
 
 ]
 
@@ -46,6 +52,9 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
 
 }
 ROOT_URLCONF = 'core.urls'
@@ -93,6 +102,8 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+AUTH_USER_MODEL = 'users.CustomUser'
 
 LANGUAGE_CODE = 'en-us'
 
