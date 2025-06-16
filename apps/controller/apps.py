@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class OwnerConfig(AppConfig):
+class ControllerConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'apps.owner'
+    name = 'apps.controller'

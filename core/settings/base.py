@@ -18,10 +18,9 @@ DJANGO_APPS = [
 ]
 
 CUSTOM_APPS = [
-    'apps.base',
     'apps.common',
     'apps.leads',
-    'apps.owner',
+    'apps.controller',
     'apps.users',
 
 ]
@@ -55,8 +54,39 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
-
 }
+
+
+TENANT_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.messages',
+    "apps.common",
+    "apps.leads",
+    "apps.users",
+]
+
+SHARED_APPS = [
+    "django_tenants",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.staticfiles",
+    "rest_framework",
+    "corsheaders",
+    "drf_spectacular",
+    "rest_framework_simplejwt",
+    "django_filters",
+
+    # apps
+    'apps.controller',
+
+]
+
+
+TENANT_MODEL = "controller.Tenant"
+TENANT_DOMAIN_MODEL = "controller.Domain"
+
+
 ROOT_URLCONF = 'core.urls'
 
 TEMPLATES = [
