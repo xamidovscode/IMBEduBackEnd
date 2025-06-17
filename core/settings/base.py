@@ -31,6 +31,8 @@ THIRD_PARTY_APPS = [
     'django_filters',
     'rest_framework_simplejwt',
 
+    'django_tenants'
+
 ]
 
 INSTALLED_APPS = DJANGO_APPS + CUSTOM_APPS + THIRD_PARTY_APPS
@@ -43,6 +45,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'django_tenants.middleware.main.TenantMainMiddleware',
+    "helpers.middleware.LanguageMiddleware",
+
 ]
 
 
@@ -56,6 +62,9 @@ REST_FRAMEWORK = {
     )
 }
 
+DATABASE_ROUTERS = (
+    'django_tenants.routers.TenantSyncRouter',
+)
 
 TENANT_APPS = [
     'django.contrib.admin',
@@ -133,15 +142,28 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-AUTH_USER_MODEL = 'users.CustomUser'
+AUTH_USER_MODEL = 'users.User'
 
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
-
 USE_TZ = True
+USE_L10N = True
+
 
 STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+LANGUAGES = [
+    ('en', 'English'),
+    ('ru', 'Russian'),
+    ('uz', 'Uzbek'),
+]
+
+LOCALE_PATHS = [
+    BASE_DIR / 'locale',
+]
+

@@ -9,3 +9,16 @@ class BaseModel(models.Model):
 
     class Meta:
         abstract = True
+
+
+class Branch(BaseModel):
+    name = models.CharField(max_length=100)
+    is_active = models.BooleanField(default=True)
+
+
+class Role(BaseModel):
+    name = models.CharField(max_length=100)
+    is_active = models.BooleanField(default=True)
+
+
+

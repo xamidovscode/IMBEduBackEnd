@@ -29,7 +29,7 @@ class CustomUserManager(BaseUserManager):
         return self.create_user(username, password, **extra_fields)
 
 
-class CustomUser(AbstractUser, BaseModel):
+class User(AbstractUser, BaseModel):
 
     first_name = None
     last_name = None
@@ -41,6 +41,16 @@ class CustomUser(AbstractUser, BaseModel):
     phone = models.CharField(
         max_length=255,
         validators=[phone_validator],
+    )
+    roles = models.ManyToManyField(
+        to='common.Role',
+        through='users.UserRole',
+        related_name='users',
+    )
+    branches = models.ManyToManyField(
+        to='common.Branch',
+        through='users.UserBranch',
+        related_name='users',
     )
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS = []
@@ -58,3 +68,34 @@ class CustomUser(AbstractUser, BaseModel):
             "refresh_token": str(refresh),
             "access_token": str(refresh.access_token),
         }
+
+
+class UserBranch(BaseModel):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="user_branches",
+    )
+    branch = models.ForeignKey(
+        'common.Branch',
+        on_delete=models.CASCADE,
+        related_name='user_branches',
+    )
+
+    class Meta:
+        unique_together = ('user', 'branch')
+
+
+class UserRole(BaseModel):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="user_roles",
+    )
+    role = models.ForeignKey(
+        'common.Role',
+        on_delete=models.CASCADE,
+        related_name="user_roles",
+    )
+
+
