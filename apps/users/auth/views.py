@@ -6,6 +6,11 @@ from rest_framework.views import APIView
 from . import serializers
 from .. import models
 
+from helpers.permissions import (
+    IsPublisher,
+
+)
+
 class LoginView(generics.CreateAPIView):
     serializer_class = serializers.LoginSerializer
     queryset = models.User.objects.all()
@@ -33,6 +38,7 @@ class LoginView(generics.CreateAPIView):
 
 class TestAPIView(APIView):
     queryset = models.User.objects.all()
+    permission_classes = [IsPublisher]
 
     def get(self, request, *args, **kwargs):
         return Response({

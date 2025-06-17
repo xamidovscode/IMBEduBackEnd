@@ -30,7 +30,6 @@ THIRD_PARTY_APPS = [
     'drf_spectacular',
     'django_filters',
     'rest_framework_simplejwt',
-
     'django_tenants'
 
 ]
@@ -167,3 +166,9 @@ LOCALE_PATHS = [
     BASE_DIR / 'locale',
 ]
 
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
