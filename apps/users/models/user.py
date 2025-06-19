@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 from rest_framework_simplejwt.tokens import RefreshToken
 from helpers import phone_validator
-from apps.common.models import BaseModel
+from apps.common.models import BaseModel, Branch
 
 
 class CustomUserManager(BaseUserManager):
@@ -42,15 +42,11 @@ class User(AbstractUser, BaseModel):
         max_length=255,
         validators=[phone_validator],
     )
-    roles = models.ManyToManyField(
-        to='common.Role',
-        through='users.UserRole',
+    role = models.ForeignKey(
+        'users.Role',
+        on_delete=models.PROTECT,
         related_name='users',
-    )
-    branches = models.ManyToManyField(
-        to='common.Branch',
-        through='users.UserBranch',
-        related_name='users',
+        null=True, blank=True,
     )
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS = []
@@ -77,7 +73,7 @@ class UserBranch(BaseModel):
         related_name="user_branches",
     )
     branch = models.ForeignKey(
-        'common.Branch',
+        Branch,
         on_delete=models.CASCADE,
         related_name='user_branches',
     )
@@ -85,17 +81,5 @@ class UserBranch(BaseModel):
     class Meta:
         unique_together = ('user', 'branch')
 
-
-class UserRole(BaseModel):
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name="user_roles",
-    )
-    role = models.ForeignKey(
-        'common.Role',
-        on_delete=models.CASCADE,
-        related_name="user_roles",
-    )
 
 

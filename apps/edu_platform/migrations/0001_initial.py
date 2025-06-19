@@ -9,16 +9,33 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
+        ('common', '0001_initial'),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Branch',
+            name='Attendance',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(max_length=100)),
+                ('date', models.DateField()),
+                ('status', models.IntegerField(choices=[(-1, 'Absent'), (0, 'Unmarked'), (1, 'Present'), (2, 'Excused')], default=0)),
+                ('reason', models.TextField(blank=True, null=True)),
+            ],
+            options={
+                'abstract': False,
+            },
+        ),
+        migrations.CreateModel(
+            name='GroupLessonDay',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('updated_at', models.DateTimeField(auto_now=True)),
+                ('day_of_week', models.IntegerField(choices=[(1, 'MONDAY'), (2, 'TUESDAY'), (3, 'THURSDAY'), (4, 'FRIDAY'), (5, 'SATURDAY'), (6, 'SUNDAY'), (7, 'WEDNESDAY')], default=1)),
+                ('start_time', models.DateTimeField()),
+                ('end_time', models.DateTimeField()),
                 ('is_active', models.BooleanField(default=True)),
             ],
             options={
@@ -26,12 +43,31 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='PaymentType',
+            name='GroupStudent',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(max_length=100)),
+                ('start_date', models.DateField()),
+                ('end_date', models.DateField()),
+                ('payment_date', models.DateField()),
+                ('is_activated', models.BooleanField(default=False)),
+                ('status', models.IntegerField(choices=[(1, 'ACTIVE'), (2, 'NEW'), (3, 'DELETED'), (4, 'FROZEN')], default=1)),
+            ],
+            options={
+                'abstract': False,
+            },
+        ),
+        migrations.CreateModel(
+            name='GroupStudentDiscount',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('updated_at', models.DateTimeField(auto_now=True)),
+                ('date', models.DateField()),
+                ('amount', models.DecimalField(decimal_places=2, default=0, max_digits=30)),
+                ('count', models.IntegerField(default=1)),
+                ('reason', models.TextField()),
                 ('is_active', models.BooleanField(default=True)),
             ],
             options={
@@ -39,61 +75,33 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='Setting',
+            name='GroupStudentPayment',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(max_length=100)),
-                ('open_time', models.TimeField()),
-                ('close_time', models.TimeField()),
-                ('logo', models.ImageField(blank=True, null=True, upload_to='')),
-                ('extra_data', models.JSONField(default=dict)),
+                ('condition', models.IntegerField(choices=[(1, 'Payment'), (2, 'Debt')], default=1)),
+                ('amount', models.DecimalField(decimal_places=2, default=0, max_digits=30)),
+                ('description', models.TextField(blank=True, null=True)),
+                ('date', models.DateField()),
             ],
             options={
                 'abstract': False,
             },
         ),
         migrations.CreateModel(
-            name='Source',
+            name='Group',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(max_length=100)),
-                ('icon', models.CharField(blank=True, max_length=100, null=True)),
-                ('is_active', models.BooleanField(default=True)),
-            ],
-            options={
-                'abstract': False,
-            },
-        ),
-        migrations.CreateModel(
-            name='Course',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(max_length=100)),
-                ('price', models.DecimalField(decimal_places=2, default=0, max_digits=36)),
-                ('duration', models.PositiveIntegerField(default=0)),
-                ('is_active', models.BooleanField(default=True)),
-                ('color', models.CharField(blank=True, max_length=100, null=True)),
-                ('branch', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='courses', to='common.branch')),
-            ],
-            options={
-                'abstract': False,
-            },
-        ),
-        migrations.CreateModel(
-            name='Room',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(max_length=100)),
-                ('is_active', models.BooleanField(default=True)),
-                ('branch', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='rooms', to='common.branch')),
+                ('name', models.CharField(max_length=255)),
+                ('start_date', models.DateTimeField()),
+                ('end_date', models.DateTimeField()),
+                ('status', models.IntegerField(choices=[(1, 'ACTIVE'), (2, 'NEW'), (3, 'DELETED'), (4, 'FROZEN')], default=1)),
+                ('branch', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='groups', to='common.branch')),
+                ('course', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='groups', to='common.course')),
+                ('room', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='groups', to='common.room')),
             ],
             options={
                 'abstract': False,

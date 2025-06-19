@@ -22,6 +22,7 @@ CUSTOM_APPS = [
     'apps.leads',
     'apps.controller',
     'apps.users',
+    'apps.edu_platform',
 
 ]
 
@@ -120,8 +121,8 @@ DATABASES = {
         'NAME': config('NAME'),
         'USER': config('USER'),
         'PASSWORD': config('PASSWORD'),
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'HOST': config('HOST'),
+        'PORT': config('PORT'),
     }
 }
 
