@@ -50,7 +50,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     'django_tenants.middleware.main.TenantMainMiddleware',
+
+
     "helpers.middleware.LanguageMiddleware",
+    "helpers.middleware.BlockAdminInPublicSchemaMiddleware",
 
 ]
 
