@@ -6,7 +6,7 @@ from . import serializers
 from .. import models
 
 from helpers.permissions import (
-    IsPublisher,
+    IsPublisher, IsPublic,
 
 )
 
@@ -17,46 +17,23 @@ class LoginView(generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
 
-        if request.tenant.schema_name != 'public':
-            serializer = self.get_serializer(data=request.data, instance=request.tenant)
-            serializer.is_valid(raise_exception=True)
+        serializer = self.get_serializer(data=request.data, instance=request.tenant)
+        serializer.is_valid(raise_exception=True)
 
-            user = serializer.validated_data["user"]
+        user = serializer.validated_data["user"]
 
-            return Response({
-                'id': user.id,
-                'username': user.username,
-                'full_name': user.full_name,
-                'phone': user.phone,
-                'token': user.tokens(),
-                'role': user.role.name if user.role else None,
-            })
-        else:
+        return Response({
+            'id': user.id,
+            'token': user.tokens(),
+        })
 
-            return Response({
-                'id': user.id,
-                'username': user.username,
-                'full_name': user.full_name,
-                'phone': user.phone,
-                'token': user.tokens(),
-                'role': user.role.name if user.role else None,
-            })
 
 
 class TestAPIView(generics.CreateAPIView):
     queryset = models.User.objects.all()
-    permission_classes = [IsPublisher]
+    permission_classes = [IsPublic]
 
     def create(self, request, *args, **kwargs):
-
-        from apps.controller.models import Tenant, Domain
-        from django_tenants.utils import schema_context
-
-        with schema_context("public"):
-            Tenant.objects.create(
-                schema_name='tests',
-                name="test",
-            )
 
         return Response({"success": True})
 

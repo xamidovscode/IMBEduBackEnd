@@ -12,3 +12,14 @@ class IsPublisher(permissions.BasePermission):
             and
             request.path == path
         )
+
+
+class IsPublic(permissions.BasePermission):
+
+    def has_permission(self, request, view):
+
+        return (
+            request.user.is_active
+            and
+            request.tenant.schema_name == "public"
+        )

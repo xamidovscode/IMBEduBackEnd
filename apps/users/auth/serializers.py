@@ -3,6 +3,7 @@ from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
 
 from .. import models
+from apps.controller import models as controller
 
 
 
@@ -18,8 +19,7 @@ class LoginSerializer(serializers.Serializer):
         if self.instance.schema_name != "public":
             user = models.User.objects.filter(username=username).first()
         else:
-            with schema_context(self.instance.schema_name):
-                user = models.User.objects.filter(username=username)
+            user = controller.User.objects.filter(username=username).first()
 
         if not user:
             raise serializers.ValidationError(
