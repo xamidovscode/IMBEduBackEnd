@@ -1,3 +1,4 @@
+from django_tenants.utils import schema_context
 from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
 
@@ -14,7 +15,11 @@ class LoginSerializer(serializers.Serializer):
         username = attrs.get("username")
         password = attrs.get("password")
 
-        user = models.User.objects.filter(username=username).first()
+        if self.instance.schema_name != "public":
+            user = models.User.objects.filter(username=username).first()
+        else:
+            with schema_context(self.instance.schema_name):
+                user = models.User.objects.filter(username=username)
 
         if not user:
             raise serializers.ValidationError(

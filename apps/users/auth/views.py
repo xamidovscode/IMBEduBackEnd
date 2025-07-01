@@ -1,7 +1,6 @@
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
-from rest_framework.views import APIView
 
 from . import serializers
 from .. import models
@@ -17,31 +16,49 @@ class LoginView(generics.CreateAPIView):
     permission_classes = [AllowAny]
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
 
-        user = serializer.validated_data["user"]
+        if request.tenant.schema_name != 'public':
+            serializer = self.get_serializer(data=request.data, instance=request.tenant)
+            serializer.is_valid(raise_exception=True)
 
-        print(self.request.path)
+            user = serializer.validated_data["user"]
 
-        return Response({
-            'id': user.id,
-            'username': user.username,
-            'full_name': user.full_name,
-            'phone': user.phone,
-            'token': user.tokens(),
-            'roles': user.roles.all().values("name"),
-            'branches': user.branches.all().values("name"),
+            return Response({
+                'id': user.id,
+                'username': user.username,
+                'full_name': user.full_name,
+                'phone': user.phone,
+                'token': user.tokens(),
+                'role': user.role.name if user.role else None,
+            })
+        else:
 
-        })
+            return Response({
+                'id': user.id,
+                'username': user.username,
+                'full_name': user.full_name,
+                'phone': user.phone,
+                'token': user.tokens(),
+                'role': user.role.name if user.role else None,
+            })
 
 
-class TestAPIView(APIView):
+class TestAPIView(generics.CreateAPIView):
     queryset = models.User.objects.all()
     permission_classes = [IsPublisher]
 
-    def get(self, request, *args, **kwargs):
-        return Response({
-            "success": True,
-        })
+    def create(self, request, *args, **kwargs):
+
+        from apps.controller.models import Tenant, Domain
+        from django_tenants.utils import schema_context
+
+        with schema_context("public"):
+            Tenant.objects.create(
+                schema_name='tests',
+                name="test",
+            )
+
+        return Response({"success": True})
+
+
 
